@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 
 	"github.com/urfave/cli"
+
+	customError "vscSettingUpdatter/error"
 )
 
 var settingsPath = "settings.json"
@@ -26,14 +28,14 @@ func main() {
 		}
 
 		if err != nil {
-			return cli.NewExitError(err, 1)
+			return customError.IoError{Msg: err.Error()}
 		}
 
 		filePath := convertHomePath(c.String("src"))
 		destPath := convertHomePath(c.String("dest"))
 
-		if (filePath == destPath) {
-			return cli.NewExitError("filepath shouldn't be the same of destPath", 1)
+		if filePath == destPath {
+			return customError.SamePathError{Msg: "filepath shouldn't be the same of destPath"}
 		}
 
 		copyFile(filePath, destPath)
@@ -41,11 +43,14 @@ func main() {
 		return nil
 	}
 
-	app.Run(os.Args)
+	err := app.Run(os.Args)
+	if err != nil {
+		println(err.Error())
+	}
 }
 
 func convertHomePath(path string) string {
-	if (path == abridgementHomePath) {
+	if path == abridgementHomePath {
 		return homePath
 	}
 	return path
@@ -54,11 +59,11 @@ func convertHomePath(path string) string {
 func createOption(app *cli.App) {
 	app.Flags = []cli.Flag{
 		cli.BoolFlag{
-			Name: "update, u",
+			Name:  "update, u",
 			Usage: "update settings.json at HOME",
 		},
 		cli.BoolFlag{
-			Name: "load, l",
+			Name:  "load, l",
 			Usage: "load settings.json at project",
 		},
 		cli.StringFlag{
