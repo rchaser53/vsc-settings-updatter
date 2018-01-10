@@ -14,7 +14,7 @@ var homePath = filepath.Join(os.Getenv("HOME"), settingsPath)
 
 func main() {
 	app := cli.NewApp()
-	setupHelp(app)
+	createOption(app)
 
 	app.Action = func(c *cli.Context) error {
 		var err error = nil
@@ -51,7 +51,7 @@ func convertHomePath(path string) string {
 	return path
 }
 
-func setupHelp(app *cli.App) {
+func createOption(app *cli.App) {
 	app.Flags = []cli.Flag{
 		cli.BoolFlag{
 			Name: "update, u",
@@ -72,6 +72,9 @@ func setupHelp(app *cli.App) {
 			Usage: "destination path",
 		},
 	}
+
+	app.Name = "vsc-settings-updatter"
+	app.Version = "0.0.1"
 }
 
 func copyFile(src string, dest string) error {
