@@ -3,7 +3,6 @@ package main
 import (
 	"io"
 	"os"
-	"log"
 	"path/filepath"
 
 	"github.com/urfave/cli"
@@ -18,21 +17,23 @@ func main() {
 	setupHelp(app)
 
 	app.Action = func(c *cli.Context) error {
-		if c.Bool("u") {
-			updateSettingsJson()
-			return nil
-		} 
+		var err error = nil
 
-		if c.Bool("l") {
-			loadSettingsJson()
-			return nil
+		if c.Bool("u") {
+			err = copyFile(settingsPath, homePath)
+		} else if c.Bool("l") {
+			err = copyFile(homePath, settingsPath)
+		}
+
+		if err != nil {
+			return cli.NewExitError(err, 1)
 		}
 
 		filePath := convertHomePath(c.String("src"))
 		destPath := convertHomePath(c.String("dest"))
 
 		if (filePath == destPath) {
-			log.Fatal("filepath shouldn't be the same of destPath")
+			return cli.NewExitError("filepath shouldn't be the same of destPath", 1)
 		}
 
 		copyFile(filePath, destPath)
@@ -41,14 +42,6 @@ func main() {
 	}
 
 	app.Run(os.Args)
-}
-
-func updateSettingsJson() {
-	copyFile(settingsPath, homePath)
-}
-
-func loadSettingsJson() {
-	copyFile(homePath, settingsPath)
 }
 
 func convertHomePath(path string) string {
@@ -81,21 +74,23 @@ func setupHelp(app *cli.App) {
 	}
 }
 
-func copyFile(src string, dest string) {
+func copyFile(src string, dest string) error {
 	file, err := os.Open(src)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	defer file.Close()
 
 	destFile, err := os.Create(dest)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	defer destFile.Close()
 
 	_, err = io.Copy(destFile, file)
 	if err != nil {
-		panic(err)
+		return err
 	}
+
+	return nil
 }
