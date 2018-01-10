@@ -19,7 +19,7 @@ func main() {
 	createOption(app)
 
 	app.Action = func(c *cli.Context) error {
-		var err error = nil
+		var err error
 
 		if c.Bool("u") {
 			err = copyFile(settingsPath, homePath)
