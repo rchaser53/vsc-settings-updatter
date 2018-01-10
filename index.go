@@ -14,39 +14,50 @@ var settingsPath = "settings.json"
 var abridgementHomePath = "~" + settingsPath
 var homePath = filepath.Join(os.Getenv("HOME"), settingsPath)
 
+type CliContext interface {
+	Bool(key string) bool
+	String(key string) string
+}
+
 func main() {
 	app := cli.NewApp()
 	createOption(app)
 
 	app.Action = func(c *cli.Context) error {
-		var err error
-
-		if c.Bool("u") {
-			err = copyFile(settingsPath, homePath)
-		} else if c.Bool("l") {
-			err = copyFile(homePath, settingsPath)
-		}
-
-		if err != nil {
-			return customError.IoError{Msg: err.Error()}
-		}
-
-		filePath := convertHomePath(c.String("src"))
-		destPath := convertHomePath(c.String("dest"))
-
-		if filePath == destPath {
-			return customError.SamePathError{Msg: "filepath shouldn't be the same of destPath"}
-		}
-
-		copyFile(filePath, destPath)
-
-		return nil
+		return ExecCli(c)
 	}
 
 	err := app.Run(os.Args)
+
 	if err != nil {
 		println(err.Error())
 	}
+}
+
+func ExecCli(c CliContext) error {
+	var err error
+
+	if c.Bool("u") {
+		err = copyFile(settingsPath, homePath)
+	} else if c.Bool("l") {
+		err = copyFile(homePath, settingsPath)
+	}
+
+	if err != nil {
+		return customError.IoError{Msg: err.Error()}
+	}
+
+	filePath := convertHomePath(c.String("src"))
+	destPath := convertHomePath(c.String("dest"))
+
+	if filePath == destPath {
+		return customError.SamePathError{Msg: "filepath shouldn't be the same of destPath"}
+	}
+
+	copyFile(filePath, destPath)
+
+	return nil
+
 }
 
 func convertHomePath(path string) string {
