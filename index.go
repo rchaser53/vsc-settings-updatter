@@ -3,6 +3,7 @@ package main
 import (
 	"io"
 	"os"
+	"log"
 	"path/filepath"
 
 	"github.com/urfave/cli"
@@ -27,6 +28,10 @@ func main() {
 		destPath := "settings.json"
 		if c.NArg() > 1 {
 			destPath = c.Args().Get(1)
+		}
+
+		if (filePath == destPath) {
+			log.Fatal("filepath shouldn't be the same of destPath")
 		}
 
 		copyFile(filePath, destPath)
