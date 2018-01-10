@@ -9,25 +9,19 @@ import (
 	"github.com/urfave/cli"
 )
 
+var settingsPath = "settings.json"
+var destDefaultPath = "~" + settingsPath
+
 func main() {
 	app := cli.NewApp()
-	app.Flags = []cli.Flag{
-		cli.StringFlag{
-			Name:  "lang",
-			Value: "english",
-			Usage: "language for the greeting",
-		},
-	}
+	setupHelp(app)
 
 	app.Action = func(c *cli.Context) error {
-		filePath := "settings.json"
-		if c.NArg() > 0 {
-			filePath = filepath.Join(c.Args().Get(0), "settings.json")
-		}
+		filePath := c.String("src")
+		destPath := c.String("dest")
 
-		destPath := "settings.json"
-		if c.NArg() > 1 {
-			destPath = c.Args().Get(1)
+		if destPath == destDefaultPath {
+			destPath = filepath.Join(os.Getenv("HOME"), settingsPath)
 		}
 
 		if (filePath == destPath) {
@@ -40,6 +34,21 @@ func main() {
 	}
 
 	app.Run(os.Args)
+}
+
+func setupHelp(app *cli.App) {
+	app.Flags = []cli.Flag{
+		cli.StringFlag{
+			Name:  "src, s",
+			Value: settingsPath,
+			Usage: "imput path",
+		},
+		cli.StringFlag{
+			Name:  "dest, d",
+			Value: destDefaultPath,
+			Usage: "destination path",
+		},
+	}
 }
 
 func copyFile(src string, dest string) {
