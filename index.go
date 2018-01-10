@@ -10,19 +10,26 @@ import (
 )
 
 var settingsPath = "settings.json"
-var destDefaultPath = "~" + settingsPath
+var abridgementHomePath = "~" + settingsPath
+var homePath = filepath.Join(os.Getenv("HOME"), settingsPath)
 
 func main() {
 	app := cli.NewApp()
 	setupHelp(app)
 
 	app.Action = func(c *cli.Context) error {
-		filePath := c.String("src")
-		destPath := c.String("dest")
+		if c.Bool("u") {
+			updateSettingsJson()
+			return nil
+		} 
 
-		if destPath == destDefaultPath {
-			destPath = filepath.Join(os.Getenv("HOME"), settingsPath)
+		if c.Bool("l") {
+			loadSettingsJson()
+			return nil
 		}
+
+		filePath := convertHomePath(c.String("src"))
+		destPath := convertHomePath(c.String("dest"))
 
 		if (filePath == destPath) {
 			log.Fatal("filepath shouldn't be the same of destPath")
@@ -36,8 +43,31 @@ func main() {
 	app.Run(os.Args)
 }
 
+func updateSettingsJson() {
+	copyFile(settingsPath, homePath)
+}
+
+func loadSettingsJson() {
+	copyFile(homePath, settingsPath)
+}
+
+func convertHomePath(path string) string {
+	if (path == abridgementHomePath) {
+		return homePath
+	}
+	return path
+}
+
 func setupHelp(app *cli.App) {
 	app.Flags = []cli.Flag{
+		cli.BoolFlag{
+			Name: "update, u",
+			Usage: "update settings.json at HOME",
+		},
+		cli.BoolFlag{
+			Name: "load, l",
+			Usage: "load settings.json at project",
+		},
 		cli.StringFlag{
 			Name:  "src, s",
 			Value: settingsPath,
@@ -45,7 +75,7 @@ func setupHelp(app *cli.App) {
 		},
 		cli.StringFlag{
 			Name:  "dest, d",
-			Value: destDefaultPath,
+			Value: homePath,
 			Usage: "destination path",
 		},
 	}
