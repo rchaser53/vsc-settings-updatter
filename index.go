@@ -57,7 +57,6 @@ func ExecCli(c CliContext) error {
 	copyFile(filePath, destPath)
 
 	return nil
-
 }
 
 func convertHomePath(path string) string {
