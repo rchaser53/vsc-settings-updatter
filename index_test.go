@@ -21,7 +21,7 @@ func TestIOError(t *testing.T) {
 
 	switch err.(type) {
 	case customError.IoError:
-		os.Exit(0)
+		return
 	default:
 		t.Error("err should be IoError")
 	}
@@ -42,7 +42,7 @@ func TestSamePathError(t *testing.T) {
 
 	switch err.(type) {
 	case customError.SamePathError:
-		os.Exit(0)
+		return
 	default:
 		t.Error("err should be SamePathError")
 	}
