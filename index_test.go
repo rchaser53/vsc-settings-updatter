@@ -1,7 +1,7 @@
 package main
 
 import (
-	"os"
+	"io/ioutil"
 	"testing"
 	customError "vscSettingUpdatter/error"
 )
@@ -45,5 +45,30 @@ func TestSamePathError(t *testing.T) {
 		return
 	default:
 		t.Error("err should be SamePathError")
+	}
+}
+
+type CopySettingsJsonMockStruct struct{}
+
+func (m CopySettingsJsonMockStruct) Bool(key string) bool {
+	return false
+}
+
+var srcPath = "fixtures/input/"
+var comparisonPath = "fixtures/comparison"
+
+func (m CopySettingsJsonMockStruct) String(key string) string {
+	if key == "src" {
+		return "fixtures/input/"
+	}
+	return "fixtures/comparison"
+}
+func TestCopySettingsJson(t *testing.T) {
+	ExecCli(CopySettingsJsonMockStruct{})
+	srcBytes, _ := ioutil.ReadFile("srcPath")
+	destBytes, _ := ioutil.ReadFile("comparisonPath")
+
+	if string(srcBytes) != string(destBytes) {
+		t.Error("should copy fixtures/input/settings.json to fixtures/comparison/settings.json")
 	}
 }
