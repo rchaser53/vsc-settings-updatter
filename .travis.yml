@@ -5,6 +5,11 @@ go:
   - 1.7.x
   - master
 
+sudo: false
+
+install:
+  - go get -t -v ./...
+
 script:
   - go test
 
