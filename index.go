@@ -7,6 +7,7 @@ import (
 
 	"github.com/urfave/cli"
 
+	"vscSettingUpdatter/connect"
 	customError "vscSettingUpdatter/error"
 )
 
@@ -49,6 +50,18 @@ func ExecCli(c CliContext) error {
 
 	filePath := convertHomePath(c.String("src"))
 	destPath := convertHomePath(c.String("dest"))
+	gitURL := convertHomePath(c.String("url"))
+
+	if c.Bool("f") {
+		fetchConfig := connect.TryGet(gitURL)
+		file, err := os.Create(destPath)
+		if err != nil {
+			return customError.IoError{Msg: err.Error()}
+		}
+
+		defer file.Close()
+		file.Write(([]byte)(fetchConfig))
+	}
 
 	if filePath == destPath {
 		return customError.SamePathError{Msg: "filepath shouldn't be the same of destPath"}
@@ -75,6 +88,14 @@ func createOption(app *cli.App) {
 		cli.BoolFlag{
 			Name:  "load, l",
 			Usage: "load settings.json at project",
+		},
+		cli.BoolFlag{
+			Name:  "fetch, f",
+			Usage: "fetch settings.json from github",
+		},
+		cli.StringFlag{
+			Name:  "url",
+			Usage: "github repository url",
 		},
 		cli.StringFlag{
 			Name:  "src, s",
