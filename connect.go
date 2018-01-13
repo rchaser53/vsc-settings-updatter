@@ -2,20 +2,32 @@ package vscSettingUpdatter
 
 import (
 	"io/ioutil"
-	"log"
 	"net/http"
+	"os"
 )
 
-func TryGet(url string) string {
-	resp, err := http.Get(url)
+type Connect interface {
+	Get(url string) (http.Response, error)
+}
 
+func PullSettigsJson(url string, destPath string) error {
+	resp, err := http.Get(url)
 	if err != nil {
-		log.Fatal(err)
+		return NetworkError{Msg: err.Error()}
 	}
 
-	byteArray, _ := ioutil.ReadAll(resp.Body)
-	bodyStr := string(byteArray)
+	byteArray, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
+	if err != nil {
+		return IoError{Msg: err.Error()}
+	}
 
-	return bodyStr
+	file, err := os.Create(destPath)
+	if err != nil {
+		return IoError{Msg: err.Error()}
+	}
+	defer file.Close()
+	file.Write(byteArray)
+
+	return nil
 }

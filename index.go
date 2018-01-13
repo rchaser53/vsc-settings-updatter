@@ -50,14 +50,10 @@ func ExecCli(c CliContext) error {
 	gitURL := convertHomePath(c.String("url"))
 
 	if c.Bool("f") {
-		fetchConfig := TryGet(gitURL)
-		file, err := os.Create(destPath)
+		err := PullSettigsJson(gitURL, destPath)
 		if err != nil {
-			return IoError{Msg: err.Error()}
+			return err
 		}
-
-		defer file.Close()
-		file.Write(([]byte)(fetchConfig))
 	}
 
 	if filePath == destPath {

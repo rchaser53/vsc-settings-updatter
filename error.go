@@ -15,3 +15,11 @@ type SamePathError struct {
 func (e SamePathError) Error() string {
 	return e.Msg
 }
+
+type NetworkError struct {
+	Msg string
+}
+
+func (e NetworkError) Error() string {
+	return e.Msg
+}
