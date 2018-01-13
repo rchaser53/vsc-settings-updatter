@@ -1,4 +1,4 @@
-package vscSettingUpdatter
+package main
 
 import (
 	"io/ioutil"

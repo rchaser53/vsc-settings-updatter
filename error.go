@@ -1,4 +1,4 @@
-package vscSettingUpdatter
+package main
 
 type IoError struct {
 	Msg string
