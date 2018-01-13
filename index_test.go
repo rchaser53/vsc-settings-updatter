@@ -1,9 +1,8 @@
-package main
+package vscSettingUpdatter
 
 import (
 	"io/ioutil"
 	"testing"
-	customError "vscSettingUpdatter/error"
 )
 
 type IOErrorMockStruct struct{}
@@ -20,7 +19,7 @@ func TestIOError(t *testing.T) {
 	err := ExecCli(IOErrorMockStruct{})
 
 	switch err.(type) {
-	case customError.IoError:
+	case IoError:
 		return
 	default:
 		t.Error("err should be IoError")
@@ -41,7 +40,7 @@ func TestSamePathError(t *testing.T) {
 	err := ExecCli(SamePathErrorMockStruct{})
 
 	switch err.(type) {
-	case customError.SamePathError:
+	case SamePathError:
 		return
 	default:
 		t.Error("err should be SamePathError")

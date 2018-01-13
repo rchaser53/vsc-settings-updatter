@@ -1,4 +1,4 @@
-package main
+package vscSettingUpdatter
 
 import (
 	"io"
@@ -6,9 +6,6 @@ import (
 	"path/filepath"
 
 	"github.com/urfave/cli"
-
-	"vscSettingUpdatter/connect"
-	customError "vscSettingUpdatter/error"
 )
 
 var settingsPath = "settings.json"
@@ -45,7 +42,7 @@ func ExecCli(c CliContext) error {
 	}
 
 	if err != nil {
-		return customError.IoError{Msg: err.Error()}
+		return IoError{Msg: err.Error()}
 	}
 
 	filePath := convertHomePath(c.String("src"))
@@ -53,10 +50,10 @@ func ExecCli(c CliContext) error {
 	gitURL := convertHomePath(c.String("url"))
 
 	if c.Bool("f") {
-		fetchConfig := connect.TryGet(gitURL)
+		fetchConfig := TryGet(gitURL)
 		file, err := os.Create(destPath)
 		if err != nil {
-			return customError.IoError{Msg: err.Error()}
+			return IoError{Msg: err.Error()}
 		}
 
 		defer file.Close()
@@ -64,7 +61,7 @@ func ExecCli(c CliContext) error {
 	}
 
 	if filePath == destPath {
-		return customError.SamePathError{Msg: "filepath shouldn't be the same of destPath"}
+		return SamePathError{Msg: "filepath shouldn't be the same of destPath"}
 	}
 
 	copyFile(filePath, destPath)
