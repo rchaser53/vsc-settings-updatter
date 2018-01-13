@@ -10,7 +10,7 @@ type Connect interface {
 	Get(url string) (*http.Response, error)
 }
 
-func createPullSettingsJson(connect Connect) func(string, string) error {
+func CreatePullSettingsJson(connect Connect) func(string, string) error {
 	return func(url string, destPath string) error {
 		resp, err := connect.Get(url)
 		if err != nil {
@@ -34,4 +34,4 @@ func createPullSettingsJson(connect Connect) func(string, string) error {
 	}
 }
 
-var PullSettigsJson = createPullSettingsJson(&http.Client{})
+var PullSettigsJson = CreatePullSettingsJson(&http.Client{})
