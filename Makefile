@@ -11,7 +11,7 @@ build: clean
 	go build -o $(OUTPUT_PATH)
 
 run:
-	go run index.go
+	go run $(shell find . -name "*.go" | grep -v _test.go)
 
 goRun:
 	$(OUTPUT_PATH)
